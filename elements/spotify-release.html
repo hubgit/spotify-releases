@@ -34,22 +34,34 @@
             }
         </style>
 
-        <template if="{{ image }}">
-            <a href="{{ item.external_urls.spotify }}" target="spotify">
-                <img src="{{ image.url }}" height="{{ image.height }}" width="{{ image.width }}">
-                <div id="name">{{ item.name }}</div>
-            </a>
-        </template>
+        <a href="{{ item.external_urls.spotify }}" target="spotify"
+            on-mouseover="{{ play }}"
+            on-mouseout="{{ pause }}">
+            <img src="{{ image.url }}" height="{{ image.height }}" width="{{ image.width }}">
+            <div id="name">{{ item.name }}</div>
+            <audio id="audio" src="{{ tracks.items[0].preview_url }}"></audio>
+        </a>
+
+        <core-ajax auto
+            url="https://api.spotify.com/v1/albums/{{ item.id }}/tracks"
+            handleAs="json"
+            response="{{ tracks }}"></core-ajax>
     </template>
 
     <script>
     Polymer({
-        itemChanged: function() {
+        ready: function() {
             var images = this.item.images.filter(function(image) {
                 return image.width == 300;
             });
 
             this.image = images.length ? images[0] : null;
+        },
+        play: function() {
+            this.$.audio.play();
+        },
+        pause: function() {
+            this.$.audio.pause();
         }
     })
     </script>

@@ -1,0 +1,41 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="spotify-releases.html">
+
+<polymer-element name="spotify-releases-browser" attributes="country limit">
+    <template>
+        <div layout horizontal>
+            <div>
+                <template repeat="{{ count, artistName in counts.artist }}">
+                    <div on-tap="{{ selectArtist }}" layout horizontal>
+                        <span>{{ artistName }}</span>
+                        <span flex>{{ count }}</span>
+                    </div>
+                </template>
+            </div>
+
+            <spotify-releases flex
+                country="{{ country }}"
+                limit="{{ limit }}"
+                on-count="{{ count }}"></spotify-releases>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            ready: function() {
+                this.counts = {};
+            },
+            count: function(event, details) {
+                if (typeof this.counts[details.type] == 'undefined') {
+                    this.counts[details.type] = {}
+                }
+
+                if (typeof this.counts[details.type][details.name] == 'undefined') {
+                    this.counts[details.type][details.name] = 0;
+                }
+
+                this.counts[details.type][details.name]++;
+            }
+        })
+    </script>
+</polymer-element>

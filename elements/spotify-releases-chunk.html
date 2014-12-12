@@ -1,6 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/font-roboto/roboto.html">
-<link rel="import" href="spotify-request.html">
 <link rel="import" href="spotify-release.html">
 
 <polymer-element name="spotify-releases-chunk" attributes="index chunk">
@@ -10,7 +9,7 @@
             font-family: Roboto, sans-serif;
         }
 
-        .load, .loading {
+        #next, #loading {
             display: block;
             padding: 10px;
             text-align: center;
@@ -21,49 +20,55 @@
             box-shadow: 0 1px 3px #777;
         }
 
-        .load {
+        #next {
             background: #55a;
             color: white;
         }
 
-        .load:hover {
+        #next:hover {
             background: #55d;
         }
         </style>
 
         <template if="{{ loading }}">
-            <div class="loading">Loading…</div>
+            <div id="loading">Loading…</div>
         </template>
 
-        <template repeat="{{ response.albums.items }}">
+        <template repeat="{{ albums }}">
             <spotify-release item="{{}}"></spotify-release>
         </template>
 
-        <template if="{{ !chunk.prepended &amp;&amp; response.albums.next }}">
-            <a class="load"
-                href="{{ response.albums.next }}"
-                on-click="{{ append }}">Load more &darr;</a>
+        <template if="{{ !chunk.prepended &amp;&amp; next }}">
+            <a id="next" href="{{ next }}" on-click="{{ append }}">Load more &darr;</a>
         </template>
 
-        <spotify-request
+        <core-ajax auto
             url="{{ chunk.url }}"
             params="{{ chunk.params }}"
+            handleAs="json"
+            loading="{{ loading }}"
             response="{{ response }}"
-            on-core-complete="{{ complete }}"></spotify-request>
+            on-core-response="{{ handleResponse }}"></core-ajax>
     </template>
 
     <script>
         Polymer({
             index: 0,
-            loading: true,
-            complete: function() {
-                this.loading = false;
+            next: false,
+            handleResponse: function(event, details, sender) {
+                this.next = details.response.albums.next;
+
+                this.albums = details.response.albums.items.filter(function(item) {
+                    return item.album_type == 'album';
+                });
+
+                console.log(this.albums);
             },
             append: function(event, details, sender) {
                 event.preventDefault();
                 this.fire('splice', { url: sender.href, index: this.index + 1, appended: true });
-                this.response.albums.next = null;
-            },
+                this.next = null;
+            }
         })
     </script>
 </polymer-element>

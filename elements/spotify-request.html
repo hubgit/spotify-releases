@@ -4,12 +4,7 @@
 <polymer-element name="spotify-request" hidden noscript attributes="url params response">
     <template>
         <template if="{{ url }}">
-            <core-ajax auto
-                url="{{ url }}"
-                params="{{ params }}"
-                handleAs="json"
-                response="{{ response }}"
-                on-core-error="{{ handleError }}"></core-ajax>
+
         </template>
     </template>
 </polymer-element>
