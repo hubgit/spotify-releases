@@ -1,0 +1,39 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="spotify-releases-chunk.html">
+
+<polymer-element name="spotify-releases" attributes="country limit">
+    <template>
+        <template repeat="{{ chunk, index in chunks }}">
+            <spotify-releases-chunk
+                index="{{ index }}"
+                chunk="{{ chunk }}"
+                on-splice="{{ splice }}"></spotify-releases-chunk>
+        </template>
+    </template>
+
+    <script>
+        Polymer({
+            country: 'GB',
+            limit: 10,
+            ready: function() {
+                this.chunks = [{
+                    url: 'https://api.spotify.com/v1/search',
+                    params: {
+                        q: 'tag:new',
+                        type: 'album',
+                        market: this.country,
+                        offset: 0,
+                        limit: this.limit
+                    },
+                    appended: true
+                }];
+            },
+            splice: function(event, details, sender) {
+                this.chunks.splice(details.index, 0, {
+                    url: details.url,
+                    appended: details.appended
+                });
+            }
+        })
+    </script>
+</polymer-element>

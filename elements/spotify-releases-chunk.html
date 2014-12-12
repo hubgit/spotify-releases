@@ -1,0 +1,69 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/font-roboto/roboto.html">
+<link rel="import" href="spotify-request.html">
+<link rel="import" href="spotify-release.html">
+
+<polymer-element name="spotify-releases-chunk" attributes="index chunk">
+    <template>
+        <style>
+        :host {
+            font-family: Roboto, sans-serif;
+        }
+
+        .load, .loading {
+            display: block;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            background: #ddd;
+            color: #777;
+            margin: 10px 0;
+            box-shadow: 0 1px 3px #777;
+        }
+
+        .load {
+            background: #55a;
+            color: white;
+        }
+
+        .load:hover {
+            background: #55d;
+        }
+        </style>
+
+        <template if="{{ loading }}">
+            <div class="loading">Loading…</div>
+        </template>
+
+        <template repeat="{{ response.albums.items }}">
+            <spotify-release item="{{}}"></spotify-release>
+        </template>
+
+        <template if="{{ !chunk.prepended &amp;&amp; response.albums.next }}">
+            <a class="load"
+                href="{{ response.albums.next }}"
+                on-click="{{ append }}">Load more &darr;</a>
+        </template>
+
+        <spotify-request
+            url="{{ chunk.url }}"
+            params="{{ chunk.params }}"
+            response="{{ response }}"
+            on-core-complete="{{ complete }}"></spotify-request>
+    </template>
+
+    <script>
+        Polymer({
+            index: 0,
+            loading: true,
+            complete: function() {
+                this.loading = false;
+            },
+            append: function(event, details, sender) {
+                event.preventDefault();
+                this.fire('splice', { url: sender.href, index: this.index + 1, appended: true });
+                this.response.albums.next = null;
+            },
+        })
+    </script>
+</polymer-element>
