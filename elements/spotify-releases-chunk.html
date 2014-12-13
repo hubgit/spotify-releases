@@ -61,8 +61,6 @@
                 this.albums = details.response.albums.items.filter(function(item) {
                     return item.album_type == 'album';
                 });
-
-                console.log(this.albums);
             },
             append: function(event, details, sender) {
                 event.preventDefault();
