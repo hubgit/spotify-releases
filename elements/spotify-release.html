@@ -39,7 +39,7 @@
             on-mouseout="{{ pause }}">
             <img src="{{ image.url }}" height="{{ image.height }}" width="{{ image.width }}">
             <div id="name">{{ item.name }}</div>
-            <audio id="audio" src="{{ tracks.items[0].preview_url }}"></audio>
+            <audio id="audio"></audio>
         </a>
 
         <core-ajax auto
@@ -57,7 +57,20 @@
 
             this.image = images.length ? images[0] : null;
         },
+        tracksChanged: function() {
+            if (this.tracks) {
+                this.audioURL = this.tracks.items[0].preview_url;
+            }
+        },
         play: function() {
+            if (!this.audioURL) {
+                return;
+            }
+            
+            if (!this.$.audio.getAttribute('src')) {
+                this.$.audio.setAttribute('src', this.audioURL);
+            }
+
             this.$.audio.play();
         },
         pause: function() {
